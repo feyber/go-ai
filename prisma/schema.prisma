@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth Required Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("USER") // ADMIN or USER
+  whatsapp      String?
+  tiktok        String?
+
+  accounts       Account[]
+  sessions       Session[]
+  subscriptions  Subscription[]
+  assignedVideos UserVideo[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// App Specific Models
+
+model WhitelistedEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  userId        String
+  tier          Int // 1, 2, or 3 videos per day
+  status        String // "pending", "completed", "cancelled"
+  orderId       String   @unique // Pakasir order id
+  amount        Int
+  paymentMethod String?
+  startedAt     DateTime @default(now())
+  expiresAt     DateTime // For monthly or yearly expiration
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Video {
+  id         String   @id @default(cuid())
+  url        String // Google drive or store URL
+  previewUrl String? // Optional preview link
+  isAssigned Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  assignment UserVideo?
+}
+
+model UserVideo {
+  id           String @id @default(cuid())
+  userId       String
+  videoId      String @unique
+  assignedDate String // Store the YYYY-MM-DD in WIB
+  downloadedAt DateTime?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
