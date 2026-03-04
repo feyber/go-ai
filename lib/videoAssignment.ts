@@ -58,14 +58,14 @@ export async function getAssignedVideos(userId: string) {
 
     if (availableVideos.length > 0) {
       await prisma.$transaction(
-        availableVideos.map(vid => prisma.video.update({
+        availableVideos.map((vid: any) => prisma.video.update({
           where: { id: vid.id },
           data: { isAssigned: true }
         }))
       );
 
       await prisma.userVideo.createMany({
-        data: availableVideos.map(vid => ({
+        data: availableVideos.map((vid: any) => ({
           userId,
           videoId: vid.id,
           assignedDate: todayWIB
@@ -85,5 +85,5 @@ export async function getAssignedVideos(userId: string) {
     }
   }
 
-  return { hasAccess: true, videos: currentAssigned.map(uv => uv.video) };
+  return { hasAccess: true, videos: currentAssigned.map((uv: any) => uv.video) };
 }
