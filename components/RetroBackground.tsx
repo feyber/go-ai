@@ -86,12 +86,14 @@ function WarpTunnel() {
             count={particleCount}
             array={particles}
             itemSize={3}
+            args={[particles, 3]}
           />
           <bufferAttribute
             attach="attributes-color"
             count={particleCount}
             array={particleColors}
             itemSize={3}
+            args={[particleColors, 3]}
           />
         </bufferGeometry>
         <pointsMaterial
