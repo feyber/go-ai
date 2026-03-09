@@ -92,11 +92,20 @@ model Video {
 }
 
 model UserVideo {
-  id           String @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
-  videoId      String @unique
+  videoId      String    @unique
   assignedDate String // Store the YYYY-MM-DD in WIB
   downloadedAt DateTime?
+
+  // TikTok URL Requirement and Stats Tracker
+  tiktokUrl     String?
+  views         Int?      @default(0)
+  likes         Int?      @default(0)
+  comments      Int?      @default(0)
+  bookmarks     Int?      @default(0)
+  shares        Int?      @default(0)
+  lastScrapedAt DateTime?
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)

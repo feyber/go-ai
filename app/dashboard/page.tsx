@@ -24,7 +24,7 @@ export default async function DashboardPage() {
     select: { email: true, whatsapp: true, tiktok: true }
   });
 
-  const { hasAccess, videos } = await getAssignedVideos(session.user.id);
+  const { hasAccess, videos, pendingVideo } = await getAssignedVideos(session.user.id);
 
   return (
     <main className="min-h-screen relative flex flex-col">
@@ -121,24 +121,64 @@ export default async function DashboardPage() {
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-                  {videos.map((vid: any, i: number) => (
-                    <div key={vid.id} style={{ border: '1px solid #333', padding: '20px', background: '#0a0a0a', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: '1.2rem', color: '#39ff14', marginBottom: '15px' }}>Video {i + 1}</div>
+                  {videos.map((vid: any, i: number) => {
+                    const isDownloaded = !!vid.downloadedAt;
+                    let blockingVideo = pendingVideo;
 
-                      {/* Video Preview or embed if available */}
-                      {vid.previewUrl ? (
-                        <div style={{ width: '100%', height: '200px', backgroundColor: '#000', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <a href={vid.previewUrl} target="_blank" rel="noreferrer" style={{ color: '#aaa', textDecoration: 'underline' }}>View Preview Link</a>
-                        </div>
-                      ) : (
-                        <div style={{ width: '100%', height: '200px', backgroundColor: '#111', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ color: '#555' }}>No Preview</span>
-                        </div>
-                      )}
+                    if (!blockingVideo && i > 0) {
+                      for (let j = 0; j < i; j++) {
+                        if (!videos[j].downloadedAt || !videos[j].tiktokUrl) {
+                          blockingVideo = videos[j];
+                          break;
+                        }
+                      }
+                    }
 
-                      <DownloadButton url={vid.url} videoId={vid.id} />
-                    </div>
-                  ))}
+                    const isLocked = !isDownloaded && !!blockingVideo;
+                    let lockReason: 'url_required' | 'previous_incomplete' | undefined;
+                    let previousVideoId: string | undefined;
+                    let previousVideoLabel: string | undefined;
+
+                    if (isLocked && blockingVideo) {
+                      previousVideoId = blockingVideo.videoId; // This must be the master Video ID for the submission API
+
+                      const blockingIndex = videos.findIndex((v: any) => v.id === blockingVideo.id);
+                      if (blockingIndex !== -1) {
+                        previousVideoLabel = `Video ${blockingIndex + 1}`;
+                      } else {
+                        previousVideoLabel = `a video from ${blockingVideo.assignedDate}`;
+                      }
+
+                      lockReason = blockingVideo.downloadedAt ? 'url_required' : 'previous_incomplete';
+                    }
+
+                    return (
+                      <div key={vid.id} style={{ border: '1px solid #333', padding: '20px', background: '#0a0a0a', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontSize: '1.2rem', color: '#39ff14', marginBottom: '15px' }}>Video {i + 1}</div>
+
+                        {/* Video Preview or embed if available */}
+                        {vid.video.previewUrl ? (
+                          <div style={{ width: '100%', height: '200px', backgroundColor: '#000', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <a href={vid.video.previewUrl} target="_blank" rel="noreferrer" style={{ color: '#aaa', textDecoration: 'underline' }}>View Preview Link</a>
+                          </div>
+                        ) : (
+                          <div style={{ width: '100%', height: '200px', backgroundColor: '#111', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ color: '#555' }}>No Preview</span>
+                          </div>
+                        )}
+
+                        <DownloadButton
+                          userVideoId={vid.id}
+                          url={vid.video.url}
+                          videoId={vid.video.id}
+                          isLocked={isLocked}
+                          lockReason={lockReason}
+                          previousVideoId={previousVideoId}
+                          previousVideoLabel={previousVideoLabel}
+                        />
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>

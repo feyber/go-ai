@@ -85,5 +85,20 @@ export async function getAssignedVideos(userId: string) {
     }
   }
 
-  return { hasAccess: true, videos: currentAssigned.map((uv: any) => uv.video) };
+  // Check for any unfulfilled video from the past (downloaded but no URL)
+  const pendingVideo = await prisma.userVideo.findFirst({
+    where: {
+      userId,
+      downloadedAt: { not: null },
+      tiktokUrl: null
+    },
+    orderBy: {
+      downloadedAt: 'asc' // The oldest unfulfilled video
+    },
+    include: {
+      video: true
+    }
+  });
+
+  return { hasAccess: true, videos: currentAssigned, pendingVideo };
 }

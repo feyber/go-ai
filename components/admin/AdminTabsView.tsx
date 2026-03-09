@@ -4,9 +4,10 @@ import { useState } from "react";
 import AdminUserManager from "@/components/admin/AdminUserManager";
 import VideoHistoryTab from "@/components/admin/VideoHistoryTab";
 import VideoListTab from "@/components/admin/VideoListTab";
+import TikTokStatsTab from "@/components/admin/TikTokStatsTab";
 
 export default function AdminTabsView() {
-  const [activeTab, setActiveTab] = useState<"users" | "history" | "videos">("history");
+  const [activeTab, setActiveTab] = useState<"users" | "history" | "videos" | "tiktok">("history");
 
   return (
     <div style={{ marginTop: '50px' }}>
@@ -52,6 +53,19 @@ export default function AdminTabsView() {
         >
           Master Video Pool
         </button>
+        <button
+          onClick={() => setActiveTab("tiktok")}
+          className="btn-retro"
+          style={{
+            padding: '10px 20px',
+            background: activeTab === "tiktok" ? 'rgba(0, 243, 255, 0.2)' : 'transparent',
+            borderColor: activeTab === "tiktok" ? '#00f3ff' : '#333',
+            color: activeTab === "tiktok" ? '#00f3ff' : '#888',
+            boxShadow: activeTab === "tiktok" ? 'inset 0 0 10px rgba(0,243,255,0.2)' : 'none'
+          }}
+        >
+          TikTok Stats
+        </button>
       </div>
 
       {/* Tab Content */}
@@ -59,6 +73,7 @@ export default function AdminTabsView() {
         {activeTab === "history" && <VideoHistoryTab />}
         {activeTab === "users" && <AdminUserManager />}
         {activeTab === "videos" && <VideoListTab />}
+        {activeTab === "tiktok" && <TikTokStatsTab />}
       </div>
 
     </div>
