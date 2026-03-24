@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Providers from '@/components/Providers';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Go. | AI Video Commerce Agency',
@@ -14,9 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased text-white bg-black" suppressHydrationWarning>
+      <body className="antialiased text-white bg-black min-h-screen flex flex-col" suppressHydrationWarning>
         <Providers>
-          {children}
+          <div className="flex-1">
+            {children}
+          </div>
+          <Footer />
         </Providers>
       </body>
     </html>

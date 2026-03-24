@@ -39,6 +39,26 @@ export default function VideoListTab() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    const firstConfirm = confirm("⚠️ WARNING: This will DELETE ALL VIDEOS in the master pool forever! Are you sure?");
+    if (!firstConfirm) return;
+    
+    const secondConfirm = confirm("⛔ FINAL WARNING: This action CANNOT BE UNDONE. All user assignments will be broken. ARE YOU ABSOLUTELY SURE?");
+    if (!secondConfirm) return;
+
+    try {
+      await fetch("/api/admin/videos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deleteAll: true })
+      });
+      fetchVideos();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to delete all videos");
+    }
+  };
+
   if (loading) return (
     <div className="admin-card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: '#39ff14', fontSize: '1.2rem', letterSpacing: '2px' }}>LOADING VIDEO MASTER LIST...</div>
@@ -49,7 +69,18 @@ export default function VideoListTab() {
     <div className="admin-card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h2 className="text-glow-green" style={{ fontSize: '1.5rem', color: '#39ff14', margin: 0 }}>Video Master Data</h2>
-        <span style={{ background: '#39ff14', color: '#000', padding: '5px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>Total: {videos.length} Videos</span>
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          {videos.length > 0 && (
+            <button 
+              onClick={handleDeleteAll}
+              className="btn-retro"
+              style={{ padding: '5px 15px', fontSize: '0.8rem', borderColor: '#ff4444', color: '#ff4444', background: 'rgba(255, 68, 68, 0.1)' }}
+            >
+              Delete All Videos
+            </button>
+          )}
+          <span style={{ background: '#39ff14', color: '#000', padding: '5px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>Total: {videos.length} Videos</span>
+        </div>
       </div>
 
       <div className="table-scroll" style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid #222' }}>

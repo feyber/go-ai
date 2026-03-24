@@ -41,8 +41,34 @@ export default function MembershipsTab() {
                   <div style={{ color: '#aaa', fontSize: '0.9rem' }}>{m.email}</div>
                 </td>
                 <td style={{ padding: '15px' }}>
-                  <div style={{ color: '#aaa', fontSize: '0.9rem' }}>WA: {m.whatsapp || 'N/A'}</div>
-                  <div style={{ color: '#aaa', fontSize: '0.9rem' }}>TikTok: {m.tiktok || 'N/A'}</div>
+                  <div style={{ color: '#aaa', fontSize: '0.9rem' }}>
+                    WA: {m.whatsapp ? (
+                      <a 
+                        href={`https://wa.me/${m.whatsapp.replace(/\D/g, '').replace(/^0/, '62').replace(/^8/, '628')}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        style={{ color: '#39ff14', textDecoration: 'none', marginLeft: '5px' }}
+                        onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+                      >
+                        {m.whatsapp}
+                      </a>
+                    ) : 'N/A'}
+                  </div>
+                  <div style={{ color: '#aaa', fontSize: '0.9rem' }}>
+                    TikTok: {m.tiktok ? (
+                      <a 
+                        href={`https://www.tiktok.com/@${m.tiktok.replace('@', '')}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        style={{ color: '#00f3ff', textDecoration: 'none', marginLeft: '5px' }}
+                        onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                        onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+                      >
+                        {m.tiktok}
+                      </a>
+                    ) : 'N/A'}
+                  </div>
                 </td>
                 <td style={{ padding: '15px' }}>
                   <span style={{ 

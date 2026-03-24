@@ -39,6 +39,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, message: 'Fonnte quota tracking has been reset to 1000.' });
     }
 
+    if (target === 'video_pool') {
+      // Set all videos back to available
+      await prisma.video.updateMany({
+        data: { isAssigned: false }
+      });
+      // Clear user-video assignments
+      await prisma.userVideo.deleteMany({});
+      
+      console.log(`ADMIN RESET: User ${userEmail} reset the entire Video Pool assignments.`);
+      return NextResponse.json({ success: true, message: 'All videos have been reset to Available.' });
+    }
+
     return NextResponse.json({ error: 'Invalid reset target' }, { status: 400 });
   } catch (error) {
     console.error('Reset error:', error);

@@ -265,3 +265,15 @@ textarea {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+.show-mobile { 
+  display: none !important; 
+}
+
+@media (max-width: 768px) {
+  .show-mobile { 
+    display: block !important; 
+  }
+  .hide-mobile { 
+    display: none !important; 
+  }
+}

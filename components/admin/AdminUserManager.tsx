@@ -199,10 +199,42 @@ export default function AdminUserManager() {
                 return (
                   <tr key={u.id}>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ fontWeight: '500' }}>{u.email}</span>
-                        {u.isWhitelisted && (
-                          <span style={{ fontSize: '0.7rem', background: 'rgba(255, 0, 127, 0.1)', color: '#ff007f', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(255, 0, 127, 0.2)' }}>WHITELISTED</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 'bold', color: '#fff', fontSize: '1rem' }}>{u.name || 'Unnamed User'}</span>
+                          {u.isWhitelisted && (
+                            <span style={{ fontSize: '0.65rem', background: 'rgba(255, 0, 127, 0.1)', color: '#ff007f', padding: '1px 5px', borderRadius: '4px', border: '1px solid rgba(255, 0, 127, 0.2)', fontWeight: 'bold' }}>WHITELISTED</span>
+                          )}
+                        </div>
+                        <div style={{ color: '#888', fontSize: '0.85rem' }}>{u.email}</div>
+                        
+                        {u.isRegistered && (
+                          <div style={{ display: 'flex', gap: '12px', marginTop: '4px', fontSize: '0.8rem' }}>
+                            {u.whatsapp && (
+                              <a 
+                                href={`https://wa.me/${u.whatsapp.replace(/\D/g, '').replace(/^0/, '62').replace(/^8/, '628')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: '#39ff14', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                onMouseOver={e => e.currentTarget.style.textDecoration = 'underline'}
+                                onMouseOut={e => e.currentTarget.style.textDecoration = 'none'}
+                              >
+                                WA: {u.whatsapp}
+                              </a>
+                            )}
+                            {u.tiktok && (
+                              <a 
+                                href={`https://www.tiktok.com/@${u.tiktok.replace('@', '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: '#00f3ff', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                onMouseOver={e => e.currentTarget.style.textDecoration = 'underline'}
+                                onMouseOut={e => e.currentTarget.style.textDecoration = 'none'}
+                              >
+                                TikTok: {u.tiktok}
+                              </a>
+                            )}
+                          </div>
                         )}
                       </div>
                     </td>

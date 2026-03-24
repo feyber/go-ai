@@ -39,7 +39,13 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    const { id } = await req.json();
+    const { id, deleteAll } = await req.json();
+    
+    if (deleteAll) {
+      await prisma.video.deleteMany({});
+      return NextResponse.json({ success: true, message: "All videos deleted" });
+    }
+
     if (!id) return NextResponse.json({ error: "Video ID is required" }, { status: 400 });
 
     await prisma.video.delete({ where: { id } });
