@@ -38,24 +38,11 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      // Google Whitelist Check
+      // Google Login (Public Registration Open)
       if (account?.provider === "google") {
         const email = user.email;
         if (!email) return false;
 
-        // Admin bypass
-        if (email === process.env.ADMIN_EMAIL) {
-          return true;
-        }
-
-        const isWhitelisted = await prisma.whitelistedEmail.findUnique({
-          where: { email }
-        });
-
-        if (!isWhitelisted) {
-          // Returning false will automatically redirect to the error page
-          return false;
-        }
         return true;
       }
 

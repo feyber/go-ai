@@ -20,18 +20,18 @@ export async function GET(req: Request) {
   // Note: assignedDate is YYYY-MM-DD string, so filtering by it requires string comparison
   // For simplicity and accuracy with time filters, we'll filter by downloadedAt or createdAt
   if (filter === "daily") {
-    dateFilter = { downloadedAt: { gte: startOfDay(now) } };
+    dateFilter = { createdAt: { gte: startOfDay(now) } };
   } else if (filter === "weekly") {
-    dateFilter = { downloadedAt: { gte: subWeeks(now, 1) } };
+    dateFilter = { createdAt: { gte: subWeeks(now, 1) } };
   } else if (filter === "monthly") {
-    dateFilter = { downloadedAt: { gte: subMonths(now, 1) } };
+    dateFilter = { createdAt: { gte: subMonths(now, 1) } };
   } else if (filter === "yearly") {
-    dateFilter = { downloadedAt: { gte: subYears(now, 1) } };
+    dateFilter = { createdAt: { gte: subYears(now, 1) } };
   }
 
   try {
     // Fetch all user videos with user info
-    const userVideos = await prisma.userVideo.findMany({
+    const posts = await prisma.tikTokPost.findMany({
       where: {
         ...dateFilter
       },
@@ -41,19 +41,19 @@ export async function GET(req: Request) {
         }
       },
       orderBy: {
-        assignedDate: 'desc'
+        createdAt: 'desc'
       }
     });
 
     // Group by user
     const groupedData: any = {};
 
-    userVideos.forEach(uv => {
-      const email = uv.user.email || "Unknown";
+    posts.forEach(post => {
+      const email = post.user.email || "Unknown";
       if (!groupedData[email]) {
         groupedData[email] = {
           userEmail: email,
-          tiktokUsername: uv.user.tiktok,
+          tiktokUsername: post.user.tiktok,
           totalViews: 0,
           totalLinks: 0,
           videos: []
@@ -61,20 +61,20 @@ export async function GET(req: Request) {
       }
 
       groupedData[email].videos.push({
-        id: uv.id,
-        videoId: uv.videoId,
-        assignedDate: uv.assignedDate,
-        tiktokUrl: uv.tiktokUrl,
-        views: uv.views,
-        likes: uv.likes,
-        comments: uv.comments,
-        bookmarks: uv.bookmarks,
-        shares: uv.shares
+        id: post.id,
+        videoId: post.id,
+        assignedDate: post.createdAt.toISOString().split('T')[0],
+        tiktokUrl: post.url,
+        views: post.views,
+        likes: post.likes,
+        comments: post.comments,
+        bookmarks: post.bookmarks,
+        shares: post.shares
       });
 
-      if (uv.tiktokUrl) {
+      if (post.url) {
         groupedData[email].totalLinks += 1;
-        groupedData[email].totalViews += (uv.views || 0);
+        groupedData[email].totalViews += (post.views || 0);
       }
     });
 

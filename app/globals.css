@@ -227,7 +227,7 @@ textarea {
   }
 
   h1 {
-    font-size: 2.5rem !important;
+    font-size: clamp(2rem, 10vw, 2.5rem) !important;
   }
 
   .admin-grid {
@@ -258,5 +258,10 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5px;
+  }
+
+  /* Force 1 column on mobile for complex grids */
+  .responsive-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }

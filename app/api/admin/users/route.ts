@@ -20,6 +20,11 @@ export async function GET() {
         orderBy: { expiresAt: "desc" },
         take: 1
       },
+      _count: {
+        select: {
+          assignedVideos: { where: { downloadedAt: { not: null } } }
+        }
+      }
     },
     orderBy: { email: 'asc' }
   });
@@ -62,6 +67,18 @@ export async function POST(req: Request) {
           paymentMethod: "manual_grant",
           expiresAt
         }
+      });
+      return NextResponse.json({ success: true });
+    }
+
+    if (action === "change_role") {
+      const { role } = await req.json();
+      if (!["USER", "OPERATOR", "ADMIN"].includes(role)) {
+        return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+      }
+      await prisma.user.update({
+        where: { id: userId },
+        data: { role }
       });
       return NextResponse.json({ success: true });
     }

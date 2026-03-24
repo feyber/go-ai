@@ -8,17 +8,19 @@ export async function POST(req: Request) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { whatsapp, tiktok } = await req.json();
+    const { whatsapp, tiktok, videoCategory } = await req.json();
 
     // Clean strings just in case
     const safeWhatsapp = whatsapp ? String(whatsapp).trim() : null;
     const safeTiktok = tiktok ? String(tiktok).trim() : null;
+    const safeCategory = videoCategory ? String(videoCategory).trim() : null;
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
       data: {
         whatsapp: safeWhatsapp,
-        tiktok: safeTiktok
+        tiktok: safeTiktok,
+        videoCategory: safeCategory
       }
     });
 

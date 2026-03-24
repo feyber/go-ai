@@ -59,6 +59,16 @@ export default function AdminUserManager() {
     fetchData();
   };
 
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    if (!confirm(`Change this user's role to ${newRole}?`)) return;
+    await fetch("/api/admin/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "change_role", userId, role: newRole })
+    });
+    fetchData();
+  };
+
   if (loading) return (
     <div className="admin-card" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: '#39ff14', fontSize: '1.2rem', letterSpacing: '2px' }}>LOADING SEKRETARIAT ADMIN...</div>
@@ -175,7 +185,9 @@ export default function AdminUserManager() {
             <thead style={{ background: '#0a0a0a' }}>
               <tr>
                 <th>Member Email</th>
+                <th>Global Role</th>
                 <th>Current Status</th>
+                <th>Downloads</th>
                 <th style={{ width: '450px' }}>Subscription Grant Panel / Action</th>
               </tr>
             </thead>
@@ -195,12 +207,31 @@ export default function AdminUserManager() {
                       </div>
                     </td>
                     <td>
+                      {u.isRegistered ? (
+                        <select 
+                          value={u.role || "USER"} 
+                          onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                          className="admin-select"
+                          style={{
+                            borderColor: u.role === "ADMIN" ? '#ffff00' : u.role === "OPERATOR" ? '#00f3ff' : '#444',
+                            color: u.role === "ADMIN" ? '#ffff00' : u.role === "OPERATOR" ? '#00f3ff' : '#fff'
+                          }}
+                        >
+                          <option value="USER">User</option>
+                          <option value="OPERATOR">Operator</option>
+                          <option value="ADMIN">Admin</option>
+                        </select>
+                      ) : (
+                        <span style={{ color: '#555', fontSize: '0.85rem' }}>-</span>
+                      )}
+                    </td>
+                    <td>
                       {!u.isRegistered ? (
                         <span style={{ color: '#ffcc00', fontStyle: 'italic', background: 'rgba(255, 204, 0, 0.1)', padding: '4px 8px', borderRadius: '4px' }}>Pending Registration</span>
                       ) : activeSub && !isExpired ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           <span style={{ color: '#39ff14', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', background: 'rgba(57, 255, 20, 0.1)', padding: '4px 8px', borderRadius: '4px', width: 'fit-content' }}>
-                            <FaCheck size={12} /> Active Tier {activeSub.tier}
+                            <FaCheck size={12} /> Active {activeSub.tier === 1 ? 'Basic' : activeSub.tier === 2 ? 'Pro' : activeSub.tier === 3 ? 'Ultimate' : `Tier ${activeSub.tier}`}
                           </span>
                           <span style={{ color: '#888', fontSize: '0.8rem', display: 'block', paddingLeft: '4px' }}>Exp: {new Date(activeSub.expiresAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                         </div>
@@ -214,9 +245,9 @@ export default function AdminUserManager() {
                         {u.isRegistered ? (
                           <>
                             <select id={`tier_${u.id}`} className="admin-select">
-                              <option value="1">Level: Tier 1</option>
-                              <option value="2">Level: Tier 2</option>
-                              <option value="3">Level: Tier 3</option>
+                              <option value="1">Level: Basic</option>
+                              <option value="2">Level: Pro</option>
+                              <option value="3">Level: Ultimate</option>
                             </select>
                             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                               <button onClick={() => {

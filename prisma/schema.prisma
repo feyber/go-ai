@@ -44,11 +44,15 @@ model User {
   role          String    @default("USER") // ADMIN or USER
   whatsapp      String?
   tiktok        String?
+  waOtpCode         String?
+  whatsappVerified  DateTime?
+  videoCategory     String?
 
   accounts       Account[]
   sessions       Session[]
   subscriptions  Subscription[]
   assignedVideos UserVideo[]
+  tiktokPosts    TikTokPost[]
 }
 
 model VerificationToken {
@@ -85,6 +89,11 @@ model Video {
   id         String   @id @default(cuid())
   url        String // Google drive or store URL
   previewUrl String? // Optional preview link
+  productUrl String? // Optional keranjang kuning/product link
+  hook       String?
+  caption    String?
+  hashtag    String?
+  category   String?
   isAssigned Boolean  @default(false)
   createdAt  DateTime @default(now())
 
@@ -109,4 +118,26 @@ model UserVideo {
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+// Dedicated TikTok Post Tracking - independent from video assignments
+model TikTokPost {
+  id        String   @id @default(cuid())
+  userId    String
+  url       String   // The TikTok post URL
+  views     Int      @default(0)
+  likes     Int      @default(0)
+  comments  Int      @default(0)
+  bookmarks Int      @default(0)
+  shares    Int      @default(0)
+  scrapedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// App Settings for quotas and configurations
+model Setting {
+  key   String @id
+  value String
 }

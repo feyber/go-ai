@@ -15,16 +15,22 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const tier = parseInt(formData.get("tier") as string || "1");
   const isYearly = formData.get("isYearly") === "true";
+  const isPayg = tier >= 10;
 
   const amount = calculatePrice(tier, isYearly);
-  const orderId = generateOrderId(session.user.id);
+  const orderId = generateOrderId(session.user.id, isPayg);
 
-  // Calculate expiration dates (1 month or 1 year from now)
+  // Calculate expiration dates
+  // For PAYG, give them an expired date or 1 day just to hold the record (logic handled in webhook)
   const expiresAt = new Date();
-  if (isYearly) {
+  if (isPayg) {
+    expiresAt.setDate(expiresAt.getDate() - 1); // instantly expired so it doesn't count as active daily sub
+  } else if (isYearly) {
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
   } else {
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
+    // 30 days total include today (+29 days), ends at 23:59:59
+    expiresAt.setDate(expiresAt.getDate() + 29);
+    expiresAt.setHours(23, 59, 59, 999);
   }
 
   // Create pending subscription in DB
