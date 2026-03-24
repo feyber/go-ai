@@ -73,7 +73,7 @@ export async function getAssignedVideos(userId: string) {
         }
       }
       console.log(`Global distribution completed successfully for ${todayWIB}.`);
-    } catch (raceConditionErr) {
+    } catch {
       // If setting already exists, it means another request got here in the exact millisecond. Safe to ignore.
       console.log(`Global distribution for ${todayWIB} handled by another request.`);
     }

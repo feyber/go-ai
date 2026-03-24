@@ -47,7 +47,12 @@ export async function POST(req: NextRequest) {
       // Clear user-video assignments
       await prisma.userVideo.deleteMany({});
       
-      console.log(`ADMIN RESET: User ${userEmail} reset the entire Video Pool assignments.`);
+      // Clear PAYG subscriptions
+      await prisma.subscription.deleteMany({
+        where: { tier: { gte: 10 } }
+      });
+      
+      console.log(`ADMIN RESET: User ${userEmail} reset the entire Video Pool assignments and PAYG subscriptions.`);
       return NextResponse.json({ success: true, message: 'All videos have been reset to Available.' });
     }
 
