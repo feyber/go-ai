@@ -61,7 +61,7 @@ export default function HowItWorks() {
           marginBottom: '80px',
           lineHeight: 1.6
         }}>
-          Kami bukan cuma buat video, kami sediain *winning ads* structure yang bikin produk kamu ludes dalam hitungan detik. Eksekusi cepat, hasil dahsyat.
+          Video yang kami hasilkan bukan cuma video biasa, kami sediakan struktur iklan yang terbukti menarik perhatian dan mendorong penjualan. Tinggal download, upload, dan lihat hasilnya.
         </p>
 
         {/* Steps Grid */}
