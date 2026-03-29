@@ -45,4 +45,4 @@ prisma/dev.db
 prisma/dev.db-journal
 
 # Video assets (too large for git, copy manually to VPS)
-public/rel\ video/
+public/relvideo/

@@ -25,7 +25,7 @@ export default function AnimatedVideoCarousel() {
               before the user adds the actual videos to the folder.
             */}
             <video 
-              src={`/rel video/${filename}`}
+              src={`/relvideo/${filename}`}
               autoPlay 
               loop 
               muted 
