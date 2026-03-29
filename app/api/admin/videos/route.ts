@@ -32,6 +32,47 @@ export async function GET() {
   }
 }
 
+// POST: Save video(s) to database (called by "Tambah Video" button)
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const superAdmins = (process.env.SUPER_ADMIN_EMAILS || "").split(",").map(e => e.trim().toLowerCase());
+  const operators = (process.env.OPERATOR_EMAILS || "").split(",").map(e => e.trim().toLowerCase());
+  const userEmail = session.user.email?.toLowerCase() || "";
+  const isSuperAdmin = superAdmins.includes(userEmail) || (session.user as any).role === "ADMIN";
+  const isOperator = operators.includes(userEmail);
+
+  if (!isSuperAdmin && !isOperator) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { urls, productUrl, caption, hashtag, category } = await req.json();
+
+    if (!urls || !Array.isArray(urls) || urls.length === 0) {
+      return NextResponse.json({ error: "Minimal 1 URL diperlukan" }, { status: 400 });
+    }
+
+    await prisma.video.createMany({
+      data: urls.map((url: string) => ({
+        url,
+        productUrl: productUrl || null,
+        caption: caption || null,
+        hashtag: hashtag || null,
+        category: category || null,
+      })),
+    });
+
+    return NextResponse.json({ success: true, count: urls.length });
+  } catch (error) {
+    console.error("Failed to save videos", error);
+    return NextResponse.json({ error: "Gagal menyimpan video" }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user || (session.user as any).role !== "ADMIN") {

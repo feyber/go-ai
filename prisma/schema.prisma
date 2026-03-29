@@ -47,6 +47,7 @@ model User {
   waOtpCode         String?
   whatsappVerified  DateTime?
   videoCategory     String?
+  hasClaimedFreeVideos Boolean @default(false)
 
   accounts       Account[]
   sessions       Session[]

@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import VideoList from "@/components/VideoList";
 import TikTokTracker from "@/components/TikTokTracker";
 
+import FreeClaimCard from "@/components/user/FreeClaimCard";
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -22,7 +24,7 @@ export default async function DashboardPage() {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { email: true, whatsapp: true, tiktok: true, whatsappVerified: true, videoCategory: true }
+    select: { email: true, whatsapp: true, tiktok: true, whatsappVerified: true, videoCategory: true, hasClaimedFreeVideos: true }
   });
 
   const rawSettings = await prisma.setting.findMany();
@@ -104,12 +106,20 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          {/* User Profile Editor */}
+          {/* User Profile Editor & Free Claim Card */}
           {dbUser && (
-            <ProfileEditor 
-              user={{ email: dbUser.email, whatsapp: dbUser.whatsapp, tiktok: dbUser.tiktok, whatsappVerified: dbUser.whatsappVerified?.toISOString() ?? null, videoCategory: dbUser.videoCategory }} 
-              activeTier={activeSubscription?.tier || 0}
-            />
+            <>
+              {(!dbUser.hasClaimedFreeVideos) && (
+                <FreeClaimCard 
+                  hasClaimedFreeVideos={dbUser.hasClaimedFreeVideos} 
+                  hasWhatsapp={!!dbUser.whatsapp} 
+                />
+              )}
+              <ProfileEditor 
+                user={{ email: dbUser.email, whatsapp: dbUser.whatsapp, tiktok: dbUser.tiktok, whatsappVerified: dbUser.whatsappVerified?.toISOString() ?? null, videoCategory: dbUser.videoCategory }} 
+                activeTier={activeSubscription?.tier || 0}
+              />
+            </>
           )}
 
           {!hasAccess ? (

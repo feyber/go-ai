@@ -199,22 +199,34 @@ export default function ProfileEditor({
           </div>
         </div>
 
-        {activeTier >= 3 && (
+        {activeTier === 3 && (
           <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffb700', marginBottom: '8px', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffb700', marginBottom: '8px', fontSize: '0.9rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
               🎥 Preferred Video Category
             </label>
             <input
               type="text"
-              placeholder="e.g. Fashion, Skincare, Tech"
+              placeholder="e.g. Fashion, Skincare, Gadget"
               value={videoCategory}
               onChange={(e) => setVideoCategory(e.target.value)}
               disabled={!isEditing}
-              style={{ width: '100%', padding: '12px', background: '#050505', border: '1px solid #333', color: '#fff', borderRadius: '6px', outline: 'none', opacity: isEditing ? 1 : 0.6, cursor: isEditing ? 'text' : 'not-allowed' }}
+              style={{ 
+                width: '100%', 
+                padding: '12px', 
+                background: '#050505', 
+                border: '1px solid #333', 
+                color: '#fff', 
+                borderRadius: '6px', 
+                outline: 'none', 
+                opacity: isEditing ? 1 : 0.6, 
+                cursor: isEditing ? 'text' : 'not-allowed'
+              }}
               onFocus={(e) => { if (isEditing) e.target.style.borderColor = '#ffb700'; }}
               onBlur={(e) => e.target.style.borderColor = '#333'}
             />
-            <small style={{ color: '#555', marginTop: '5px', display: 'block' }}>Hanya untuk Ultimate members.</small>
+            <small style={{ color: '#ffb700', marginTop: '8px', display: 'block', opacity: 0.8 }}>
+              👑 Fitur Eksklusif Ultimate: Masukkan kategori (Alat Bantu) agar video harian menyesuaikan minatmu.
+            </small>
           </div>
         )}
 

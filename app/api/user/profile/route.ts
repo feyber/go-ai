@@ -10,10 +10,24 @@ export async function POST(req: Request) {
   try {
     const { whatsapp, tiktok, videoCategory } = await req.json();
 
-    // Clean strings just in case
+    // 1. Check active subscription tier
+    const subscription = await prisma.subscription.findFirst({
+      where: {
+        userId: session.user.id,
+        status: 'completed',
+        expiresAt: { gt: new Date() }
+      },
+      orderBy: { startedAt: 'desc' }
+    });
+
+    const isUltimate = subscription?.tier === 3;
+
+    // 2. Clean strings just in case
     const safeWhatsapp = whatsapp ? String(whatsapp).trim() : null;
     const safeTiktok = tiktok ? String(tiktok).trim() : null;
-    const safeCategory = videoCategory ? String(videoCategory).trim() : null;
+    
+    // Only allow category if Ultimate, otherwise clear it (auto-random logic)
+    const safeCategory = (isUltimate && videoCategory) ? String(videoCategory).trim() : null;
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
